@@ -341,6 +341,7 @@ export default function AdminDashboard() {
                         { id: 'orders', label: 'Pedidos', icon: Package },
                         { id: 'catalog', label: 'Catálogo', icon: Tag },
                         { id: 'inventory', label: 'Estoque', icon: Store },
+                        { id: 'users', label: 'Equipe', icon: Users },
                         { id: 'settings', label: 'Loja', icon: SettingsIcon }
                     ].map(tab => (
                         <button
