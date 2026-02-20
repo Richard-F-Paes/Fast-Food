@@ -423,8 +423,8 @@ export default function AdminDashboard() {
                 <h1 className="text-3xl font-[1000] text-slate-900 tracking-tighter uppercase italic text-center leading-none">Gestão<br />Vanessa Xavier</h1>
             </header>
 
-            {/* Tabs Toggle */}
-            <div className="px-8 mt-8 mb-8 overflow-x-auto no-scrollbar flex justify-center">
+            {/* Tabs Toggle - Sticky for better navigation */}
+            <div className="sticky top-0 z-40 bg-slate-50/80 backdrop-blur-md px-8 py-6 overflow-x-auto no-scrollbar flex justify-center border-b border-transparent data-[stuck=true]:border-slate-100 transition-all">
                 <div className="bg-slate-200/50 p-1.5 rounded-[32px] flex gap-1 min-w-max border border-slate-200">
                     {[
                         { id: 'orders', label: 'Pedidos', icon: Package },
@@ -539,7 +539,7 @@ export default function AdminDashboard() {
                                 {products.map(product => (
                                     <div key={product.id} className="bg-white border border-slate-100 p-5 rounded-[35px] flex items-center justify-between shadow-sm">
                                         <div className="flex items-center gap-4 text-left">
-                                            <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-sm bg-slate-50 flex-shrink-0 border border-slate-100">
+                                            <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-sm bg-slate-50 shrink-0 border border-slate-100">
                                                 <img src={product.image_url} className="w-full h-full object-cover" />
                                             </div>
                                             <div>
@@ -577,9 +577,9 @@ export default function AdminDashboard() {
                         </div>
 
                         {/* Listagem de Estoque */}
-                        <div className="space-y-4 px-1">
+                        <div className="space-y-4 px-1 w-full pb-20">
                             {inventory.map(item => (
-                                <div key={item.id} className="bg-white border border-slate-100 p-6 rounded-[40px] shadow-sm space-y-4">
+                                <div key={item.id} className="bg-white border border-slate-100 p-4 sm:p-6 rounded-[32px] sm:rounded-[40px] shadow-sm space-y-4 scroll-mt-32">
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <h5 className="font-black text-slate-900 text-lg tracking-tighter leading-tight">{item.name}</h5>
@@ -597,7 +597,7 @@ export default function AdminDashboard() {
                                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Qtd Atual</p>
                                             <p className="font-[1000] text-slate-900 text-xl">{item.quantity} {item.unit}</p>
                                         </div>
-                                        <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100">
+                                        <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 z-10">
                                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Custo Unid.</p>
                                             <p className="font-[1000] text-slate-900 text-xl">R$ {Number(item.cost_per_unit).toFixed(2)}</p>
                                         </div>
@@ -689,9 +689,9 @@ export default function AdminDashboard() {
 
                             <div className="space-y-3">
                                 {allUsers.map((u) => (
-                                    <div key={u.id} className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm flex items-center justify-between group animate-in slide-in-from-bottom-2 duration-300">
+                                    <div key={u.id} className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm flex items-center justify-between group animate-in slide-in-from-bottom-2 duration-300 scroll-mt-32">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-yellow-400 transition-colors">
+                                            <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-yellow-400 transition-colors">
                                                 <Users className="w-5 h-5 text-slate-300 group-hover:text-slate-900" />
                                             </div>
                                             <div>
@@ -758,7 +758,7 @@ export default function AdminDashboard() {
 
             {/* Product Modal */}
             {isProductModalOpen && (
-                <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-[100] flex items-start justify-center animate-in fade-in duration-300 overflow-y-auto p-4 md:p-10">
+                <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-100 flex items-start justify-center animate-in fade-in duration-300 overflow-y-auto p-4 md:p-10">
                     <div className="bg-white w-full max-w-lg rounded-[50px] p-10 space-y-10 animate-in zoom-in duration-500 shadow-2xl my-auto">
                         <div className="flex justify-between items-center text-slate-900 border-b border-slate-100 pb-8">
                             <h3 className="text-3xl font-[1000] tracking-tighter uppercase italic">{editingProduct ? "Editar Doce" : "Novo Doce"}</h3>
@@ -898,7 +898,7 @@ export default function AdminDashboard() {
 
             {/* Inventory Modal */}
             {isInventoryModalOpen && (
-                <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-[100] flex items-end justify-center animate-in fade-in duration-300 overflow-y-auto pt-20">
+                <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-100 flex items-end justify-center animate-in fade-in duration-300 overflow-y-auto pt-20">
                     <div className="bg-white w-full max-w-lg rounded-t-[50px] p-10 space-y-10 animate-in slide-in-from-bottom duration-500 shadow-2xl">
                         <div className="flex justify-between items-center text-slate-900 border-b border-slate-100 pb-8">
                             <h3 className="text-3xl font-[1000] tracking-tighter uppercase italic">{editingInventory ? "Editar Insumo" : "Novo Insumo"}</h3>
