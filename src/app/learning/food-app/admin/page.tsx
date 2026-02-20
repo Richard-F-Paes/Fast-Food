@@ -50,21 +50,22 @@ export default function AdminDashboard() {
                         .eq('id', session.user.id)
                         .single();
 
+                    setCurrentUser({
+                        email: session.user.email,
+                        id: session.user.id,
+                        role: profile?.role || "Sem Cargo"
+                    });
+
                     if (profileError || !profile) {
-                        // If profile is missing, maybe it's a new user that hasn't triggered handle_new_user yet
-                        // or RLS is blocking. 
                         console.error("Profile check error:", profileError);
-                        setError("Erro ao verificar perfil. Tente rodar o script de reparo no banco de dados.");
-                        setTimeout(() => router.push("/learning/food-app"), 3000);
+                        setError("Seu perfil ainda não foi ativado como Admin. Rode o script 'supabase_definitive_fix.sql'.");
                     } else if (profile.role !== 'admin') {
                         setError("Acesso Negado: Apenas administradores podem acessar o painel.");
-                        setTimeout(() => router.push("/learning/food-app"), 3000);
                     } else {
                         setAuthLoading(false);
                     }
                 } catch (err) {
                     setError("Erro inesperado na autenticação.");
-                    setTimeout(() => router.push("/learning/food-app"), 3000);
                 }
             }
         };
@@ -81,6 +82,7 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [stats, setStats] = useState({ sales: 0, active: 0, customers: 0 });
+    const [currentUser, setCurrentUser] = useState<{ email?: string, id?: string, role?: string } | null>(null);
 
     // User Creation Form
     const [newUserForm, setNewUserForm] = useState({ email: "", password: "", fullName: "", role: "customer" });
@@ -355,7 +357,7 @@ export default function AdminDashboard() {
     if (authLoading || error) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white p-8">
-                <div className="text-center space-y-6 max-w-sm">
+                <div className="text-center space-y-6 w-full max-w-sm">
                     {error ? (
                         <>
                             <div className="w-20 h-20 bg-rose-50 rounded-[32px] mx-auto flex items-center justify-center text-rose-500 shadow-sm">
@@ -365,6 +367,32 @@ export default function AdminDashboard() {
                                 <h2 className="text-xl font-[1000] text-slate-900 uppercase tracking-tighter italic">Acesso Restrito</h2>
                                 <p className="text-xs text-slate-400 font-bold leading-relaxed">{error}</p>
                             </div>
+
+                            {/* Diagnostics Card */}
+                            <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-100 space-y-4 text-left">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Diagnóstico do Acesso</p>
+                                <div className="space-y-3">
+                                    <div>
+                                        <p className="text-[8px] font-black text-slate-400 uppercase">E-mail Logado</p>
+                                        <p className="text-xs font-bold text-slate-600 truncate">{currentUser?.email}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[8px] font-black text-slate-400 uppercase">Cargo Atual</p>
+                                        <p className="text-xs font-bold text-yellow-600 uppercase italic">{currentUser?.role}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[8px] font-black text-slate-400 uppercase">Seu ID no Banco</p>
+                                        <p className="text-[10px] font-mono text-slate-400 break-all">{currentUser?.id}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => router.push("/learning/food-app/profile")}
+                                className="w-full h-14 bg-slate-100 text-slate-900 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all"
+                            >
+                                Sair e tentar outra conta
+                            </button>
                         </>
                     ) : (
                         <>
