@@ -8,8 +8,8 @@ import Link from "next/link";
 
 export default function ProfilePage() {
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
-    const [user, setUser] = useState<any>(null);
+    const [authLoading, setAuthLoading] = useState(true);
+    const [profile, setProfile] = useState<any>(null);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -17,8 +17,9 @@ export default function ProfilePage() {
             if (!session) {
                 router.push("/learning/food-app/login?redirect=/learning/food-app/profile");
             } else {
-                setUser(session.user);
-                setLoading(false);
+                const { data } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                setProfile(data);
+                setAuthLoading(false);
             }
         };
         checkUser();
@@ -29,10 +30,11 @@ export default function ProfilePage() {
         router.push("/learning/food-app");
     };
 
-    if (loading) {
+    if (authLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
+            <div className="min-h-screen flex items-center justify-center bg-white text-center space-y-4 flex-col">
                 <Loader2 className="w-10 h-10 animate-spin text-slate-200" />
+                <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Carregando Perfil...</p>
             </div>
         );
     }
@@ -65,9 +67,13 @@ export default function ProfilePage() {
                 </div>
                 <div className="text-center">
                     <h2 className="text-2xl font-[1000] text-slate-900 tracking-tight">
-                        {user?.email?.split('@')[0] || "Vanessa Xavier"}
+                        {profile?.full_name || "Vanessa Xavier"}
                     </h2>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{user?.email}</p>
+                    <div className="flex items-center justify-center gap-2 mt-1">
+                        <span className="text-[9px] bg-slate-100 px-3 py-1 rounded-full text-slate-400 font-black uppercase tracking-widest border border-slate-50">
+                            {profile?.role || "Cliente"}
+                        </span>
+                    </div>
                 </div>
             </section>
 

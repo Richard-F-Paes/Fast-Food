@@ -1,6 +1,31 @@
 "use client";
 
-import { ArrowLeft, Package, Settings as SettingsIcon, Plus, Trash2, CheckCircle2, Clock, X, Image as ImageIcon, Search, Loader2, Tag, Store, Edit } from "lucide-react";
+import {
+    ArrowLeft,
+    Package,
+    Settings as SettingsIcon,
+    Plus,
+    Trash2,
+    CheckCircle2,
+    Clock,
+    X,
+    Image as ImageIcon,
+    Search,
+    Loader2,
+    Tag,
+    Store,
+    Edit,
+    Users,
+    Box,
+    LayoutGrid,
+    MessageCircle,
+    Save,
+    Upload,
+    TrendingUp,
+    Truck,
+    BookOpen,
+    DollarSign
+} from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -17,7 +42,14 @@ export default function AdminDashboard() {
             if (!session) {
                 router.push("/learning/food-app/login?redirect=/learning/food-app/admin");
             } else {
-                setAuthLoading(false);
+                // Check role
+                const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+                if (profile?.role !== 'admin') {
+                    alert("Acesso Negado: Apenas administradores podem acessar o painel.");
+                    router.push("/learning/food-app");
+                } else {
+                    setAuthLoading(false);
+                }
             }
         };
         checkAuth();
@@ -29,6 +61,7 @@ export default function AdminDashboard() {
     const [categories, setCategories] = useState<any[]>([]);
     const [settings, setSettings] = useState<any[]>([]);
     const [inventory, setInventory] = useState<any[]>([]);
+    const [allUsers, setAllUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({ sales: 0, active: 0, customers: 0 });
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,8 +83,19 @@ export default function AdminDashboard() {
             fetchCatalog();
             fetchSettings();
             fetchInventory();
+            fetchUsers();
         }
     }, [authLoading]); // Depend on authLoading
+
+    async function fetchUsers() {
+        const { data } = await supabase.from('profiles').select('*');
+        if (data) setAllUsers(data);
+    }
+
+    async function updateRole(userId: string, newRole: string) {
+        await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
+        fetchUsers();
+    }
 
     async function fetchData() {
         setLoading(true);
@@ -474,6 +518,35 @@ export default function AdminDashboard() {
                                         </button>
                                         <button onClick={() => deleteInventory(item.id)} className="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center border border-red-100 active:scale-95 transition-all"><Trash2 className="w-5 h-5" /></button>
                                     </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'users' && (
+                    <div className="space-y-10 w-full max-w-sm">
+                        <div className="bg-slate-900 p-8 rounded-[40px] text-white shadow-2xl shadow-slate-200 border-b-8 border-slate-950">
+                            <h3 className="font-[1000] text-2xl tracking-tighter uppercase italic">Equipe</h3>
+                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Controle de Acesso</p>
+                        </div>
+
+                        <div className="space-y-3">
+                            {allUsers.map((u) => (
+                                <div key={u.id} className="bg-white p-5 rounded-[32px] border border-slate-100 shadow-sm flex items-center justify-between">
+                                    <div>
+                                        <p className="font-black text-slate-900 text-sm">{u.full_name || "Sem Nome"}</p>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase">{u.role}</p>
+                                    </div>
+                                    <select
+                                        value={u.role}
+                                        onChange={(e) => updateRole(u.id, e.target.value)}
+                                        className="bg-slate-50 border-none rounded-xl px-3 py-1.5 font-bold text-[10px] uppercase outline-none"
+                                    >
+                                        <option value="customer">Cliente</option>
+                                        <option value="staff">Staff</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
                                 </div>
                             ))}
                         </div>
