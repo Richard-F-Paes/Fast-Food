@@ -23,15 +23,15 @@ export default function ProfilePage() {
             <section className="flex flex-col items-center space-y-4">
                 <div className="relative">
                     <div className="w-32 h-32 rounded-[48px] bg-slate-100 overflow-hidden border-4 border-white shadow-2xl">
-                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=400&auto=format&fit=crop" alt="Profile" className="w-full h-full object-cover" />
+                        <img src="https://scontent-gru2-1.xx.fbcdn.net/v/t39.30808-1/472418619_3466482066816217_2787800987024034324_n.jpg?stp=dst-jpg_s100x100_tt6&_nc_cat=107&ccb=1-7&_nc_sid=e99d92&_nc_ohc=wJ7vyM6x_ToQ7kNvwGWqsO6&_nc_oc=AdnW5oOSsTpb2adN_evLAh_ufZoC64TTdOd3wY9-uhE8IFeUf1chSy5YjvixHbTBiTs&_nc_zt=24&_nc_ht=scontent-gru2-1.xx&_nc_gid=2dfLgtoHA62k-AH_qNsbnA&oh=00_AfuBaWVumOVMz7hMagp2FqV3vq35ETk52dbsV18Pi-a9cw&oe=699D8183" alt="Profile" className="w-full h-full object-cover" />
                     </div>
                     <div className="absolute -bottom-2 -right-2 bg-yellow-400 w-10 h-10 rounded-2xl flex items-center justify-center border-4 border-white shadow-lg">
                         <User className="w-4 h-4 text-slate-900 fill-current" />
                     </div>
                 </div>
                 <div className="text-center">
-                    <h2 className="text-2xl font-[1000] text-slate-900 tracking-tight">Richard Silva</h2>
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Premium Foodie 👑</p>
+                    <h2 className="text-2xl font-[1000] text-slate-900 tracking-tight">Vanessa Xavier</h2>
+                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest"></p>
                 </div>
             </section>
 
