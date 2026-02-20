@@ -42,13 +42,29 @@ export default function AdminDashboard() {
             if (!session) {
                 router.push("/learning/food-app/login?redirect=/learning/food-app/admin");
             } else {
-                // Check role
-                const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
-                if (profile?.role !== 'admin') {
-                    alert("Acesso Negado: Apenas administradores podem acessar o painel.");
-                    router.push("/learning/food-app");
-                } else {
-                    setAuthLoading(false);
+                // Check role with error handling
+                try {
+                    const { data: profile, error: profileError } = await supabase
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', session.user.id)
+                        .single();
+
+                    if (profileError || !profile) {
+                        // If profile is missing, maybe it's a new user that hasn't triggered handle_new_user yet
+                        // or RLS is blocking. 
+                        console.error("Profile check error:", profileError);
+                        setError("Erro ao verificar perfil. Tente rodar o script de reparo no banco de dados.");
+                        setTimeout(() => router.push("/learning/food-app"), 3000);
+                    } else if (profile.role !== 'admin') {
+                        setError("Acesso Negado: Apenas administradores podem acessar o painel.");
+                        setTimeout(() => router.push("/learning/food-app"), 3000);
+                    } else {
+                        setAuthLoading(false);
+                    }
+                } catch (err) {
+                    setError("Erro inesperado na autenticação.");
+                    setTimeout(() => router.push("/learning/food-app"), 3000);
                 }
             }
         };
@@ -63,7 +79,12 @@ export default function AdminDashboard() {
     const [inventory, setInventory] = useState<any[]>([]);
     const [allUsers, setAllUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [stats, setStats] = useState({ sales: 0, active: 0, customers: 0 });
+
+    // User Creation Form
+    const [newUserForm, setNewUserForm] = useState({ email: "", password: "", fullName: "" });
+    const [isCreatingUser, setIsCreatingUser] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Modal State
@@ -95,6 +116,29 @@ export default function AdminDashboard() {
     async function updateRole(userId: string, newRole: string) {
         await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
         fetchUsers();
+    }
+
+    async function handleCreateUser(e: React.FormEvent) {
+        e.preventDefault();
+        setIsCreatingUser(true);
+        try {
+            const { data, error } = await supabase.auth.signUp({
+                email: newUserForm.email,
+                password: newUserForm.password,
+                options: {
+                    data: { full_name: newUserForm.fullName },
+                    emailRedirectTo: window.location.origin + '/learning/food-app'
+                }
+            });
+            if (error) throw error;
+            alert("Convite enviado! O novo membro precisa confirmar o e-mail para ativar a conta.");
+            setNewUserForm({ email: "", password: "", fullName: "" });
+            fetchUsers();
+        } catch (err: any) {
+            alert("Erro ao criar usuário: " + err.message);
+        } finally {
+            setIsCreatingUser(false);
+        }
     }
 
     async function fetchData() {
@@ -305,12 +349,26 @@ export default function AdminDashboard() {
         fetchSettings();
     };
 
-    if (authLoading) {
+    if (authLoading || error) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
-                <div className="text-center space-y-4">
-                    <Loader2 className="w-10 h-10 animate-spin text-slate-200 mx-auto" />
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verificando Credenciais...</p>
+            <div className="min-h-screen flex items-center justify-center bg-white p-8">
+                <div className="text-center space-y-6 max-w-sm">
+                    {error ? (
+                        <>
+                            <div className="w-20 h-20 bg-rose-50 rounded-[32px] mx-auto flex items-center justify-center text-rose-500 shadow-sm">
+                                <X className="w-10 h-10" />
+                            </div>
+                            <div className="space-y-2">
+                                <h2 className="text-xl font-[1000] text-slate-900 uppercase tracking-tighter italic">Acesso Restrito</h2>
+                                <p className="text-xs text-slate-400 font-bold leading-relaxed">{error}</p>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <Loader2 className="w-10 h-10 animate-spin text-slate-200 mx-auto" />
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verificando Credenciais...</p>
+                        </>
+                    )}
                 </div>
             </div>
         );
@@ -526,30 +584,93 @@ export default function AdminDashboard() {
                 )}
 
                 {activeTab === 'users' && (
-                    <div className="space-y-10 w-full max-w-sm">
-                        <div className="bg-slate-900 p-8 rounded-[40px] text-white shadow-2xl shadow-slate-200 border-b-8 border-slate-950">
-                            <h3 className="font-[1000] text-2xl tracking-tighter uppercase italic">Equipe</h3>
-                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Controle de Acesso</p>
+                    <div className="space-y-10 w-full max-w-sm pb-20">
+                        {/* New User Form */}
+                        <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm space-y-6">
+                            <div className="space-y-1">
+                                <h3 className="font-[1000] text-xl tracking-tighter uppercase italic">Novo Membro</h3>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Adicionar à Equipe</p>
+                            </div>
+
+                            <form onSubmit={handleCreateUser} className="space-y-4 pt-4">
+                                <div className="space-y-1">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-4">Nome Completo</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        placeholder="Ex: João Silva"
+                                        value={newUserForm.fullName}
+                                        onChange={e => setNewUserForm({ ...newUserForm, fullName: e.target.value })}
+                                        className="w-full h-14 bg-slate-50 rounded-2xl px-6 font-bold text-slate-900 border-none outline-none focus:ring-2 ring-slate-100"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-4">E-mail</label>
+                                    <input
+                                        required
+                                        type="email"
+                                        placeholder="email@confeitaria.com"
+                                        value={newUserForm.email}
+                                        onChange={e => setNewUserForm({ ...newUserForm, email: e.target.value })}
+                                        className="w-full h-14 bg-slate-50 rounded-2xl px-6 font-bold text-slate-900 border-none outline-none focus:ring-2 ring-slate-100"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-4">Senha Provisória</label>
+                                    <input
+                                        required
+                                        type="password"
+                                        placeholder="••••••••"
+                                        value={newUserForm.password}
+                                        onChange={e => setNewUserForm({ ...newUserForm, password: e.target.value })}
+                                        className="w-full h-14 bg-slate-50 rounded-2xl px-6 font-bold text-slate-900 border-none outline-none focus:ring-2 ring-slate-100"
+                                    />
+                                </div>
+                                <button
+                                    disabled={isCreatingUser}
+                                    type="submit"
+                                    className="w-full h-14 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg"
+                                >
+                                    {isCreatingUser ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                                    Criar Acesso
+                                </button>
+                            </form>
                         </div>
 
-                        <div className="space-y-3">
-                            {allUsers.map((u) => (
-                                <div key={u.id} className="bg-white p-5 rounded-[32px] border border-slate-100 shadow-sm flex items-center justify-between">
-                                    <div>
-                                        <p className="font-black text-slate-900 text-sm">{u.full_name || "Sem Nome"}</p>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase">{u.role}</p>
+                        {/* User List */}
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center px-4">
+                                <h4 className="text-[11px] font-[1000] text-slate-900 uppercase tracking-widest italic">Membros Ativos</h4>
+                                <span className="bg-slate-100 px-3 py-1 rounded-full text-[9px] font-black text-slate-400">{allUsers.length}</span>
+                            </div>
+
+                            <div className="space-y-3">
+                                {allUsers.map((u) => (
+                                    <div key={u.id} className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm flex items-center justify-between group animate-in slide-in-from-bottom-2 duration-300">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-yellow-400 transition-colors">
+                                                <Users className="w-5 h-5 text-slate-300 group-hover:text-slate-900" />
+                                            </div>
+                                            <div>
+                                                <p className="font-black text-slate-900 text-sm">{u.full_name || "Membro"}</p>
+                                                <div className="flex items-center gap-1.5">
+                                                    <div className={cn("w-1.5 h-1.5 rounded-full", u.role === 'admin' ? "bg-yellow-400" : "bg-slate-300")} />
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{u.role}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <select
+                                            value={u.role}
+                                            onChange={(e) => updateRole(u.id, e.target.value)}
+                                            className="bg-slate-50 border-none rounded-2xl px-4 py-2 font-black text-[9px] uppercase outline-none shadow-inner cursor-pointer"
+                                        >
+                                            <option value="customer">Cliente</option>
+                                            <option value="staff">Staff</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
                                     </div>
-                                    <select
-                                        value={u.role}
-                                        onChange={(e) => updateRole(u.id, e.target.value)}
-                                        className="bg-slate-50 border-none rounded-xl px-3 py-1.5 font-bold text-[10px] uppercase outline-none"
-                                    >
-                                        <option value="customer">Cliente</option>
-                                        <option value="staff">Staff</option>
-                                        <option value="admin">Admin</option>
-                                    </select>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
                 )}
