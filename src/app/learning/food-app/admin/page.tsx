@@ -83,7 +83,7 @@ export default function AdminDashboard() {
     const [stats, setStats] = useState({ sales: 0, active: 0, customers: 0 });
 
     // User Creation Form
-    const [newUserForm, setNewUserForm] = useState({ email: "", password: "", fullName: "" });
+    const [newUserForm, setNewUserForm] = useState({ email: "", password: "", fullName: "", role: "customer" });
     const [isCreatingUser, setIsCreatingUser] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -126,13 +126,16 @@ export default function AdminDashboard() {
                 email: newUserForm.email,
                 password: newUserForm.password,
                 options: {
-                    data: { full_name: newUserForm.fullName },
+                    data: {
+                        full_name: newUserForm.fullName,
+                        role: newUserForm.role
+                    },
                     emailRedirectTo: window.location.origin + '/learning/food-app'
                 }
             });
             if (error) throw error;
             alert("Convite enviado! O novo membro precisa confirmar o e-mail para ativar a conta.");
-            setNewUserForm({ email: "", password: "", fullName: "" });
+            setNewUserForm({ email: "", password: "", fullName: "", role: "customer" });
             fetchUsers();
         } catch (err: any) {
             alert("Erro ao criar usuário: " + err.message);
@@ -625,6 +628,18 @@ export default function AdminDashboard() {
                                         onChange={e => setNewUserForm({ ...newUserForm, password: e.target.value })}
                                         className="w-full h-14 bg-slate-50 rounded-2xl px-6 font-bold text-slate-900 border-none outline-none focus:ring-2 ring-slate-100"
                                     />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-4">Nível de Acesso</label>
+                                    <select
+                                        value={newUserForm.role}
+                                        onChange={e => setNewUserForm({ ...newUserForm, role: e.target.value })}
+                                        className="w-full h-14 bg-slate-50 rounded-2xl px-6 font-bold text-slate-900 border-none outline-none focus:ring-2 ring-slate-100 uppercase text-[10px] cursor-pointer"
+                                    >
+                                        <option value="customer">Cliente</option>
+                                        <option value="staff">Staff (Funcionário)</option>
+                                        <option value="admin">Administrador</option>
+                                    </select>
                                 </div>
                                 <button
                                     disabled={isCreatingUser}
