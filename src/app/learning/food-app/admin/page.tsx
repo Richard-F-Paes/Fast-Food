@@ -1,12 +1,28 @@
 "use client";
 
-import { ArrowLeft, Users, Package, TrendingUp, Search, MessageCircle, CheckCircle2, Clock, Truck, Plus, Settings as SettingsIcon, Tag, Store, Trash2, Edit, X, Save, Image as ImageIcon, Upload } from "lucide-react";
+import { ArrowLeft, Package, Settings as SettingsIcon, Plus, Trash2, CheckCircle2, Clock, X, Image as ImageIcon, Search, Loader2, Tag, Store, Edit } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
+    const router = useRouter();
+    const [authLoading, setAuthLoading] = useState(true);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                router.push("/learning/food-app/login?redirect=/learning/food-app/admin");
+            } else {
+                setAuthLoading(false);
+            }
+        };
+        checkAuth();
+    }, [router]);
+
     const [activeTab, setActiveTab] = useState('orders');
     const [orders, setOrders] = useState<any[]>([]);
     const [products, setProducts] = useState<any[]>([]);
@@ -29,11 +45,13 @@ export default function AdminDashboard() {
     const [inventoryForm, setInventoryForm] = useState({ name: "", quantity: "", unit: "kg", cost_per_unit: "", min_stock_level: "" });
 
     useEffect(() => {
-        fetchData();
-        fetchCatalog();
-        fetchSettings();
-        fetchInventory();
-    }, []);
+        if (!authLoading) { // Only fetch data if authenticated
+            fetchData();
+            fetchCatalog();
+            fetchSettings();
+            fetchInventory();
+        }
+    }, [authLoading]); // Depend on authLoading
 
     async function fetchData() {
         setLoading(true);
@@ -242,6 +260,17 @@ export default function AdminDashboard() {
         await supabase.from('settings').update({ value: newValue }).eq('id', id);
         fetchSettings();
     };
+
+    if (authLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="text-center space-y-4">
+                    <Loader2 className="w-10 h-10 animate-spin text-slate-200 mx-auto" />
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verificando Credenciais...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-50/50 animate-in fade-in duration-700">

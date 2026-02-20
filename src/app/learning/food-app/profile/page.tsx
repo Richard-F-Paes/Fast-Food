@@ -1,7 +1,41 @@
-import { ArrowLeft, User, Settings, CreditCard, Bell, MapPin, ChevronRight, LogOut, ShieldCheck } from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, User, Settings, CreditCard, Bell, MapPin, ChevronRight, LogOut, ShieldCheck, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 export default function ProfilePage() {
+    const router = useRouter();
+    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        const checkUser = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                router.push("/learning/food-app/login?redirect=/learning/food-app/profile");
+            } else {
+                setUser(session.user);
+                setLoading(false);
+            }
+        };
+        checkUser();
+    }, [router]);
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        router.push("/learning/food-app");
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <Loader2 className="w-10 h-10 animate-spin text-slate-200" />
+            </div>
+        );
+    }
     return (
         <div className="p-6 pb-32 space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
             {/* Header */}
@@ -30,8 +64,10 @@ export default function ProfilePage() {
                     </div>
                 </div>
                 <div className="text-center">
-                    <h2 className="text-2xl font-[1000] text-slate-900 tracking-tight">Vanessa Xavier</h2>
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest"></p>
+                    <h2 className="text-2xl font-[1000] text-slate-900 tracking-tight">
+                        {user?.email?.split('@')[0] || "Vanessa Xavier"}
+                    </h2>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{user?.email}</p>
                 </div>
             </section>
 
@@ -80,8 +116,11 @@ export default function ProfilePage() {
                     </div>
                 ))}
 
-                <div className="bg-rose-50 rounded-[28px] p-5 flex items-center gap-4 border border-rose-100/50 cursor-pointer active:scale-95 transition-all mt-8">
-                    <div className="bg-rose-500 w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-200">
+                <div
+                    onClick={handleLogout}
+                    className="bg-rose-50 rounded-[28px] p-5 flex items-center gap-4 border border-rose-100/50 cursor-pointer active:scale-95 transition-all mt-8 group"
+                >
+                    <div className="bg-rose-500 w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-200 group-hover:scale-110 transition-transform">
                         <LogOut className="w-6 h-6 text-white" />
                     </div>
                     <span className="font-[1000] text-rose-500 text-[15px] uppercase tracking-wider">Sair da Conta</span>
