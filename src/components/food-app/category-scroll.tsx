@@ -4,11 +4,32 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
-export function CustomCategoryScroll({ onCategoryChange }: { onCategoryChange?: (id: string) => void }) {
+interface Category {
+    id: string;
+    name: string;
+}
+
+interface CustomCategoryScrollProps {
+    onCategoryChange?: (id: string) => void;
+    initialCategories?: Category[];
+    labels?: {
+        all?: string;
+    };
+    className?: string;
+}
+
+export function CustomCategoryScroll({
+    onCategoryChange,
+    initialCategories,
+    labels = { all: "Tudo" },
+    className
+}: CustomCategoryScrollProps) {
     const [active, setActive] = useState("all");
-    const [categories, setCategories] = useState<{ id: string, name: string }[]>([]);
+    const [categories, setCategories] = useState<Category[]>(initialCategories || []);
 
     useEffect(() => {
+        if (initialCategories) return;
+
         const fetchCategories = async () => {
             const { data } = await supabase
                 .from('categories')
@@ -16,11 +37,11 @@ export function CustomCategoryScroll({ onCategoryChange }: { onCategoryChange?: 
                 .order('display_order', { ascending: true });
 
             if (data) {
-                setCategories([{ id: 'all', name: 'Tudo' }, ...data]);
+                setCategories([{ id: 'all', name: labels.all || 'Tudo' }, ...data]);
             }
         };
         fetchCategories();
-    }, []);
+    }, [initialCategories, labels.all]);
 
     const handleSelect = (id: string) => {
         setActive(id);
@@ -28,7 +49,7 @@ export function CustomCategoryScroll({ onCategoryChange }: { onCategoryChange?: 
     };
 
     return (
-        <div className="flex gap-4 overflow-x-auto pb-2 -mx-8 px-8 no-scrollbar">
+        <div className={cn("flex gap-4 overflow-x-auto pb-2 -mx-8 px-8 no-scrollbar", className)}>
             {categories.map((cat) => (
                 <button
                     key={cat.id}
@@ -46,3 +67,4 @@ export function CustomCategoryScroll({ onCategoryChange }: { onCategoryChange?: 
         </div>
     );
 }
+

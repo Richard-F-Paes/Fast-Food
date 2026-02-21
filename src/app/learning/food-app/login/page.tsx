@@ -35,9 +35,27 @@ export default function LoginPage() {
         setError(null);
 
         try {
+            let loginEmail = email;
+
+            // Check if input is a username (doesn't contain @)
+            if (!isSignUp && !email.includes("@")) {
+                // Find profile by username and get their email
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('email')
+                    .eq('username', email)
+                    .single();
+
+                if (profileError || !profile || !profile.email) {
+                    throw new Error("Usuário não encontrado ou e-mail não vinculado. Tente usar seu e-mail.");
+                }
+
+                loginEmail = profile.email;
+            }
+
             if (isSignUp) {
                 const { error } = await supabase.auth.signUp({
-                    email,
+                    email: loginEmail,
                     password,
                     options: {
                         emailRedirectTo: window.location.origin + '/learning/food-app'
@@ -46,7 +64,7 @@ export default function LoginPage() {
                 if (error) throw error;
                 alert("Verifique seu e-mail para confirmar o cadastro!");
             } else {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
                 if (error) throw error;
                 router.push(redirectTo);
             }
@@ -93,7 +111,7 @@ export default function LoginPage() {
 
                     <form onSubmit={handleAuth} className="space-y-4">
                         <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
-                            <label className="text-[10px] text-slate-400 font-black uppercase tracking-widest ml-4">E-mail</label>
+                            <label className="text-[10px] text-slate-400 font-black uppercase tracking-widest ml-4">E-mail ou Usuário</label>
                             <div className="relative">
                                 <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
                                 <input

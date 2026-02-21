@@ -1,11 +1,17 @@
 "use client";
 
-import { Home, ClipboardList, Gift, ShoppingCart, User } from "lucide-react";
+import { Home, ClipboardList, Gift, ShoppingCart, User, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "../../lib/utils";
 
-const navItems = [
+export interface NavItem {
+    icon: LucideIcon;
+    label: string;
+    href: string;
+}
+
+const defaultNavItems: NavItem[] = [
     { icon: Home, label: "Início", href: "/learning/food-app" },
     { icon: ClipboardList, label: "Pedidos", href: "/learning/food-app/orders" },
     { icon: Gift, label: "Ofertas", href: "/learning/food-app/offers" },
@@ -13,12 +19,22 @@ const navItems = [
     { icon: User, label: "Perfil", href: "/learning/food-app/profile" },
 ];
 
-export default function NavV1() {
+interface BottomNavProps {
+    items?: NavItem[];
+    activeColor?: string;
+    className?: string;
+}
+
+export default function BottomNav({
+    items = defaultNavItems,
+    activeColor = "text-slate-900",
+    className
+}: BottomNavProps) {
     const pathname = usePathname();
 
     return (
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 bg-white px-8 py-5 flex justify-between items-center rounded-t-[45px] shadow-[0_-15px_60px_-15px_rgba(0,0,0,0.08)] border-t border-slate-50">
-            {navItems.map((item) => {
+        <div className={cn("fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 bg-white px-8 py-5 flex justify-between items-center rounded-t-[45px] shadow-[0_-15px_60px_-15px_rgba(0,0,0,0.08)] border-t border-slate-50", className)}>
+            {items.map((item) => {
                 const isActive = pathname === item.href;
                 const IconComponent = item.icon;
 
@@ -30,7 +46,7 @@ export default function NavV1() {
                     >
                         <div className={cn(
                             "p-1.5 rounded-xl transition-all duration-300",
-                            isActive ? "text-slate-900" : "text-slate-300 group-hover:text-slate-500"
+                            isActive ? activeColor : "text-slate-300 group-hover:text-slate-500"
                         )}>
                             <IconComponent
                                 className={cn(
@@ -42,13 +58,13 @@ export default function NavV1() {
                         <span
                             className={cn(
                                 "text-[10px] font-black uppercase tracking-wider transition-all duration-300",
-                                isActive ? "text-slate-900 opacity-100" : "text-slate-300 opacity-0 group-hover:opacity-100"
+                                isActive ? cn("opacity-100", activeColor) : "text-slate-300 opacity-0 group-hover:opacity-100"
                             )}
                         >
                             {item.label}
                         </span>
                         {isActive && (
-                            <div className="absolute -bottom-2 w-1.5 h-1.5 bg-slate-900 rounded-full animate-in zoom-in duration-300" />
+                            <div className={cn("absolute -bottom-2 w-1.5 h-1.5 rounded-full animate-in zoom-in duration-300", activeColor.replace('text-', 'bg-'))} />
                         )}
                     </Link>
                 );
@@ -56,3 +72,4 @@ export default function NavV1() {
         </div>
     );
 }
+

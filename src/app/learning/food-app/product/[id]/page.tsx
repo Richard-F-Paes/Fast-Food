@@ -1,19 +1,65 @@
 "use client";
 
-import { ArrowLeft, Heart, Star, Minus, Plus, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Heart, Star, Minus, Plus, ShoppingBag, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { useCartStore } from "@/store/food-app-v2/cart-store";
 
 export default function ProductDetailPage() {
+    const params = useParams();
+    const router = useRouter();
+    const { addItem } = useCartStore();
     const [quantity, setQuantity] = useState(1);
+    const [product, setProduct] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            if (!params.id) return;
+            const { data, error } = await supabase
+                .from('products')
+                .select('*')
+                .eq('id', params.id)
+                .single();
+
+            if (data) {
+                setProduct(data);
+            }
+            setLoading(false);
+        };
+        fetchProduct();
+    }, [params.id]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <Loader2 className="w-10 h-10 animate-spin text-slate-200" />
+            </div>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-white p-8 text-center space-y-4">
+                <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter italic">Produto não encontrado</h1>
+                <Link href="/learning/food-app">
+                    <button className="h-14 px-8 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest">
+                        Voltar para a Loja
+                    </button>
+                </Link>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col min-h-screen bg-white animate-in fade-in duration-700">
             {/* Product Image Area */}
             <div className="relative h-[450px] w-full bg-slate-100 rounded-b-[60px] overflow-hidden shadow-2xl">
                 <img
-                    src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop"
-                    alt="Product"
+                    src={product.image_url || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop"}
+                    alt={product.name}
                     className="w-full h-full object-cover"
                 />
 
@@ -39,9 +85,9 @@ export default function ProductDetailPage() {
 
             {/* Content Area */}
             <div className="flex-1 px-8 pt-10 space-y-8 pb-32">
-                <div className="space-y-2">
-                    <h1 className="text-4xl font-[1000] text-slate-900 tracking-tighter leading-none">Beef Cheese Burger</h1>
-                    <p className="text-slate-400 font-bold text-sm tracking-wide">Combo Especial com Batata e Bebida</p>
+                <div className="space-y-2 text-center md:text-left">
+                    <h1 className="text-4xl font-[1000] text-slate-900 tracking-tighter leading-tight italic uppercase">{product.name}</h1>
+                    <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em] italic">Vanessa Xavier Sweets</p>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -61,27 +107,40 @@ export default function ProductDetailPage() {
                         </button>
                     </div>
                     <div className="text-right">
-                        <span className="text-4xl font-[1000] text-slate-900 tracking-tighter">R$ {(15 * quantity).toFixed(2)}</span>
+                        <span className="text-4xl font-[1000] text-slate-900 tracking-tighter">R$ {(product.price * quantity).toFixed(2)}</span>
                     </div>
                 </div>
 
                 <div className="space-y-4">
-                    <h3 className="text-sm font-[1000] text-slate-900 uppercase tracking-widest italic">Descrição</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed font-medium">
-                        Nosso clássico Beef Cheese Burger é feito com 180g de carne bovina premium, queijo derretido, alface fresca e nosso molho secreto da casa, servido em um pão brioche artesanal.
+                    <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest italic flex items-center gap-2">
+                        <div className="w-1 h-3 bg-yellow-400 rounded-full" />
+                        Descrição do Doce
+                    </h3>
+                    <p className="text-slate-500 text-sm leading-relaxed font-medium bg-slate-50/50 p-6 rounded-[32px] border border-slate-100 italic">
+                        {product.description || "Este doce artesanal foi preparado com todo carinho pela Vanessa Xavier. Experimente o sabor inesquecível de uma produção exclusiva!"}
                     </p>
                 </div>
 
                 {/* Add to Cart Footer */}
                 <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-full max-w-[380px] px-6 z-50">
-                    <Link href="/learning/food-app/cart">
-                        <button className="w-full h-20 bg-slate-900 hover:bg-black text-white rounded-[32px] shadow-2xl shadow-slate-400 flex items-center justify-center gap-4 mb-20 active:scale-[0.98] transition-all group">
-                            <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <ShoppingBag className="w-6 h-6 text-[#FFC700]" />
-                            </div>
-                            <span className="font-[1000] text-lg uppercase tracking-tight">Adicionar ao Carrinho</span>
-                        </button>
-                    </Link>
+                    <button
+                        onClick={() => {
+                            addItem({
+                                id: product.id,
+                                name: product.name,
+                                price: product.price,
+                                image: product.image_url,
+                                quantity: quantity
+                            });
+                            router.push('/learning/food-app/cart');
+                        }}
+                        className="w-full h-20 bg-slate-900 hover:bg-black text-white rounded-[32px] shadow-2xl shadow-slate-400 flex items-center justify-center gap-4 mb-20 active:scale-[0.98] transition-all group border-b-8 border-slate-950"
+                    >
+                        <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <ShoppingBag className="w-6 h-6 text-[#FFC700]" />
+                        </div>
+                        <span className="font-[1000] text-lg uppercase tracking-tight">Adicionar ao Carrinho</span>
+                    </button>
                 </div>
             </div>
         </div>

@@ -1,46 +1,14 @@
 "use client";
 
-import { Search, SlidersHorizontal, MapPin, Bell, ShieldCheck } from "lucide-react";
+import { Search, MapPin, Bell, ShieldCheck } from "lucide-react";
 import { CustomCategoryScroll } from "@/components/food-app/category-scroll";
-import { CustomProductCard } from "@/components/food-app/custom-product-card";
+import { ProductCard } from "@/components/food-app/product-card";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { useProducts } from "@/hooks/use-products";
+import { formatPrice } from "@/lib/utils/format-currency";
 
 export default function FoodAppHomePage() {
-    const [products, setProducts] = useState<any[]>([]);
-    const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchProducts();
-    }, []);
-
-    const fetchProducts = async () => {
-        setLoading(true);
-        const { data } = await supabase
-            .from('products')
-            .select('*')
-            .eq('is_available', true);
-
-        if (data) {
-            setProducts(data);
-            setFilteredProducts(data);
-        }
-        setLoading(false);
-    };
-
-    const handleCategoryChange = (categoryId: string) => {
-        if (categoryId === 'all') {
-            setFilteredProducts(products);
-        } else {
-            setFilteredProducts(products.filter(p => p.category_id === categoryId));
-        }
-    };
-
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price);
-    };
+    const { filteredProducts, loading, filterByCategory } = useProducts();
 
     return (
         <div className="flex flex-col bg-white items-center w-full pb-32">
@@ -107,7 +75,7 @@ export default function FoodAppHomePage() {
                     <Link href="/learning/food-app/popular" className="text-[10px] font-black text-[#FFC700] uppercase tracking-[0.2em]">Ver cardápio completo</Link>
                 </div>
                 <div className="px-8 text-center flex justify-center">
-                    <CustomCategoryScroll onCategoryChange={handleCategoryChange} />
+                    <CustomCategoryScroll onCategoryChange={filterByCategory} />
                 </div>
             </section>
 
@@ -121,7 +89,7 @@ export default function FoodAppHomePage() {
                         <div className="text-center font-bold text-slate-300 py-20">Carregando cardápio...</div>
                     ) : filteredProducts.map(product => (
                         <Link key={product.id} href={`/learning/food-app/product/${product.id}`}>
-                            <CustomProductCard
+                            <ProductCard
                                 name={product.name}
                                 price={formatPrice(product.price)}
                                 originalPrice={product.original_price ? formatPrice(product.original_price) : undefined}
@@ -129,6 +97,7 @@ export default function FoodAppHomePage() {
                                 reviews={product.reviews_count}
                                 deliveryTime="30 min"
                                 image={product.image_url}
+                                variant="vertical"
                             />
                         </Link>
                     ))}
@@ -137,3 +106,4 @@ export default function FoodAppHomePage() {
         </div>
     );
 }
+

@@ -5,13 +5,19 @@ import { cn } from "../../lib/utils";
 
 interface CartItemProps {
     name: string;
-    price: string;
+    price: string | number;
     quantity: number;
     weight?: string; // e.g. "1.5kg"
     obs?: string;    // e.g. "Sem cebola"
     image?: string;
-    onDelete?: () => void;
+    onDelete: () => void;
+    onUpdateQuantity?: (newQuantity: number) => void;
+    onUpdateObs?: (newObs: string) => void;
     className?: string;
+    labels?: {
+        noImage?: string;
+        obsPlaceholder?: string;
+    };
 }
 
 export function CartItem({
@@ -22,8 +28,16 @@ export function CartItem({
     obs,
     image,
     onDelete,
+    onUpdateQuantity,
+    onUpdateObs,
     className,
+    labels = {
+        noImage: "Sem Foto",
+        obsPlaceholder: "Adicionar observação..."
+    },
 }: CartItemProps) {
+    const displayPrice = typeof price === 'number' ? price.toString() : price;
+
     return (
         <div className={cn("flex flex-col gap-3 p-5 bg-white rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-slate-50", className)}>
             <div className="flex items-center gap-5">
@@ -31,7 +45,9 @@ export function CartItem({
                     {image ? (
                         <img src={image} alt={name} className="w-full h-full object-cover" />
                     ) : (
-                        <div className="bg-slate-100 flex items-center justify-center w-full h-full text-[10px] font-black uppercase text-slate-300">Sem Foto</div>
+                        <div className="bg-slate-100 flex items-center justify-center w-full h-full text-[10px] font-black uppercase text-slate-300">
+                            {labels.noImage}
+                        </div>
                     )}
                 </div>
                 <div className="flex-1 space-y-1">
@@ -53,28 +69,35 @@ export function CartItem({
                     </div>
                     <div className="flex justify-between items-center pt-2">
                         <div className="flex items-center bg-slate-50 rounded-2xl p-1 gap-3 border border-slate-100/50">
-                            <button className="w-8 h-8 flex items-center justify-center bg-white rounded-xl text-slate-400 shadow-sm active:scale-90 transition-all">
+                            <button
+                                onClick={() => onUpdateQuantity?.(Math.max(1, quantity - 1))}
+                                className="w-8 h-8 flex items-center justify-center bg-white rounded-xl text-slate-400 shadow-sm active:scale-90 transition-all"
+                            >
                                 <Minus className="w-4 h-4" />
                             </button>
                             <span className="text-sm font-[1000] text-slate-900 w-4 text-center">{quantity}</span>
-                            <button className="w-8 h-8 flex items-center justify-center bg-slate-900 rounded-xl text-white shadow-sm active:scale-90 transition-all">
+                            <button
+                                onClick={() => onUpdateQuantity?.(quantity + 1)}
+                                className="w-8 h-8 flex items-center justify-center bg-slate-900 rounded-xl text-white shadow-sm active:scale-90 transition-all"
+                            >
                                 <Plus className="w-4 h-4" />
                             </button>
                         </div>
-                        <span className="font-[1000] text-slate-900 text-lg tracking-tighter">{price}</span>
+                        <span className="font-[1000] text-slate-900 text-lg tracking-tighter">{displayPrice}</span>
                     </div>
                 </div>
             </div>
 
-            {/* Observation field inside the card if present or as a placeholder */}
             <div className="flex items-center gap-3 bg-slate-50/50 p-3 rounded-2xl border border-dashed border-slate-200">
                 <MessageSquareText className="w-4 h-4 text-slate-300" />
                 <input
-                    placeholder="Adicionar observação..."
+                    placeholder={labels.obsPlaceholder}
                     defaultValue={obs}
+                    onChange={(e) => onUpdateObs?.(e.target.value)}
                     className="bg-transparent border-none outline-none text-[11px] font-bold text-slate-500 placeholder:text-slate-300 flex-1"
                 />
             </div>
         </div>
     );
 }
+

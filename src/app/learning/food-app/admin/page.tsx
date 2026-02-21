@@ -540,7 +540,11 @@ export default function AdminDashboard() {
                                     <div key={product.id} className="bg-white border border-slate-100 p-5 rounded-[35px] flex items-center justify-between shadow-sm">
                                         <div className="flex items-center gap-4 text-left">
                                             <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-sm bg-slate-50 shrink-0 border border-slate-100">
-                                                <img src={product.image_url} className="w-full h-full object-cover" />
+                                                {product.image_url ? (
+                                                    <img src={product.image_url} className="w-full h-full object-cover" alt={product.name} />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-300 text-[8px] font-black uppercase">Sem Foto</div>
+                                                )}
                                             </div>
                                             <div>
                                                 <h5 className="font-black text-slate-900 text-sm tracking-tighter leading-tight">{product.name}</h5>
@@ -577,7 +581,7 @@ export default function AdminDashboard() {
                         </div>
 
                         {/* Listagem de Estoque */}
-                        <div className="space-y-4 px-1 w-full pb-20">
+                        <div className="space-y-4 px-1 w-full pb-40 rounded-[40px]">
                             {inventory.map(item => (
                                 <div key={item.id} className="bg-white border border-slate-100 p-4 sm:p-6 rounded-[32px] sm:rounded-[40px] shadow-sm space-y-4 scroll-mt-32">
                                     <div className="flex justify-between items-start">
@@ -758,7 +762,7 @@ export default function AdminDashboard() {
 
             {/* Product Modal */}
             {isProductModalOpen && (
-                <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-100 flex items-start justify-center animate-in fade-in duration-300 overflow-y-auto p-4 md:p-10">
+                <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-[100] flex items-start justify-center animate-in fade-in duration-300 overflow-y-auto p-4 md:p-10">
                     <div className="bg-white w-full max-w-lg rounded-[50px] p-10 space-y-10 animate-in zoom-in duration-500 shadow-2xl my-auto">
                         <div className="flex justify-between items-center text-slate-900 border-b border-slate-100 pb-8">
                             <h3 className="text-3xl font-[1000] tracking-tighter uppercase italic">{editingProduct ? "Editar Doce" : "Novo Doce"}</h3>
@@ -832,6 +836,16 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
 
+                            <div className="grid gap-3">
+                                <label className="text-[11px] font-black text-slate-400 uppercase ml-4 tracking-[0.2em]">Descrição</label>
+                                <textarea
+                                    value={productForm.description}
+                                    onChange={e => setProductForm({ ...productForm, description: e.target.value })}
+                                    className="w-full h-32 bg-slate-50 rounded-[30px] p-8 font-bold text-slate-600 outline-none border border-slate-100 focus:ring-4 ring-yellow-400/10 text-sm shadow-inner placeholder:text-slate-200 resize-none"
+                                    placeholder="Descreva seu doce aqui..."
+                                />
+                            </div>
+
                             {/* RECEITA / COMPOSIÇÃO - FOCO VANESSA */}
                             <div className="bg-slate-50/50 rounded-[40px] p-6 border border-slate-100 space-y-4">
                                 <div className="flex justify-between items-center px-2">
@@ -898,8 +912,8 @@ export default function AdminDashboard() {
 
             {/* Inventory Modal */}
             {isInventoryModalOpen && (
-                <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-100 flex items-end justify-center animate-in fade-in duration-300 overflow-y-auto pt-20">
-                    <div className="bg-white w-full max-w-lg rounded-t-[50px] p-10 space-y-10 animate-in slide-in-from-bottom duration-500 shadow-2xl">
+                <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-[100] flex items-start justify-center animate-in fade-in duration-300 overflow-y-auto p-4 md:p-10">
+                    <div className="bg-white w-full max-w-lg rounded-[50px] p-10 space-y-10 animate-in zoom-in duration-500 shadow-2xl my-auto">
                         <div className="flex justify-between items-center text-slate-900 border-b border-slate-100 pb-8">
                             <h3 className="text-3xl font-[1000] tracking-tighter uppercase italic">{editingInventory ? "Editar Insumo" : "Novo Insumo"}</h3>
                             <button onClick={() => setIsInventoryModalOpen(false)} className="w-14 h-14 bg-slate-100 rounded-full flex items-center justify-center active:scale-90 transition-all border border-slate-200">
