@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
-export default function LoginPage() {
+
+function LoginContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [email, setEmail] = useState("");
@@ -68,8 +68,9 @@ export default function LoginPage() {
                 if (error) throw error;
                 router.push(redirectTo);
             }
-        } catch (err: any) {
-            setError(err.message || "Erro ao autenticar. Verifique seus dados.");
+        } catch (err: unknown) {
+            const error = err as { message?: string };
+            setError(error.message || "Erro ao autenticar. Verifique seus dados.");
         } finally {
             setIsLoading(false);
         }
@@ -180,3 +181,12 @@ export default function LoginPage() {
         </div>
     );
 }
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-slate-300" /></div>}>
+            <LoginContent />
+        </Suspense>
+    );
+}
+
