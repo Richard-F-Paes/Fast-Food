@@ -1,6 +1,6 @@
 "use client";
 
-import { ShoppingBag, ArrowLeft, MapPin, Phone, CreditCard, Banknote, QrCode, Trash2, Tag, User, Home, Copy, Check, Loader2, MessageCircle } from "lucide-react";
+import { ShoppingBag, ArrowLeft, MapPin, Phone, CreditCard, Banknote, QrCode, Tag, User, Copy, Check, Loader2, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { CartItem } from "@/components/food-app/cart-item";
@@ -171,7 +171,7 @@ export default function CartPage() {
             </table>
 
             <div class="total">
-                <strong>Total Geral: R$ ${getTotalPrice().toFixed(2)}</strong>
+                <strong>Total Geral: R$ ${grandTotal.toFixed(2)}</strong>
             </div>
 
             <div class="footer">
@@ -250,9 +250,10 @@ export default function CartPage() {
 
             clearCart();
             alert("Pedido finalizado com sucesso! ✅");
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Erro no pedido:", error);
-            alert("Erro ao processar o pedido: " + (error?.message || JSON.stringify(error)));
+            const err = error as { message?: string };
+            alert("Erro ao processar o pedido: " + (err?.message || JSON.stringify(error)));
         } finally {
             setIsSaving(false);
         }

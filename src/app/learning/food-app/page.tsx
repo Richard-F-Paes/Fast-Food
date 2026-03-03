@@ -6,9 +6,12 @@ import { ProductCard } from "@/components/food-app/product-card";
 import Link from "next/link";
 import { useProducts } from "@/hooks/use-products";
 import { formatPrice } from "@/lib/utils/format-currency";
+import { useState } from "react";
+
 
 export default function FoodAppHomePage() {
     const { filteredProducts, loading, filterByCategory } = useProducts();
+  
 
     return (
         <div className="flex flex-col bg-white items-center w-full pb-32">
@@ -39,6 +42,10 @@ export default function FoodAppHomePage() {
                 </div>
             </header>
 
+
+    
+       
+
             {/* Hero Banner Promo */}
             <section className="px-8 py-4 w-full max-w-[430px]">
                 <div className="relative h-56 w-full bg-[#FFC700] rounded-[48px] overflow-hidden shadow-2xl shadow-yellow-100 group">
@@ -56,6 +63,7 @@ export default function FoodAppHomePage() {
                     </div>
                 </div>
             </section>
+
 
             {/* Search area */}
             <section className="px-8 py-8 flex flex-col gap-4 items-center w-full max-w-[430px]">
@@ -90,6 +98,7 @@ export default function FoodAppHomePage() {
                     ) : filteredProducts.map(product => (
                         <Link key={product.id} href={`/learning/food-app/product/${product.id}`}>
                             <ProductCard
+                                id={product.id}
                                 name={product.name}
                                 price={formatPrice(product.price)}
                                 originalPrice={product.original_price ? formatPrice(product.original_price) : undefined}
@@ -100,9 +109,16 @@ export default function FoodAppHomePage() {
                                 variant="vertical"
                             />
                         </Link>
+                        
                     ))}
                 </div>
+
+
+
             </section>
+        
+
+      
         </div>
     );
 }
