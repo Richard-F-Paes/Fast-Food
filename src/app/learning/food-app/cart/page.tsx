@@ -29,21 +29,43 @@ export default function CartPage() {
     }, []);
 
     const fetchSettings = async () => {
-        const { data } = await supabase.from('settings').select('*').eq('key', 'delivery_fee').single();
-        if (data) setDeliveryFee(Number(data.value));
+        try {
+            console.log("Fetching delivery_fee from Supabase...");
+            const { data, error } = await supabase.from('settings').select('*').eq('key', 'delivery_fee').single();
+            if (error) {
+                console.error("Supabase error fetching delivery_fee:", error);
+                throw error;
+            }
+            if (data) {
+                console.log("Delivery fee found:", data.value);
+                setDeliveryFee(Number(data.value));
+            }
+        } catch (err) {
+            console.error("Fetch failure in fetchSettings:", err);
+        }
     };
 
     const handleApplyCoupon = async () => {
-        const { data } = await supabase.from('coupons').select('*').eq('code', couponCode).eq('is_active', true).single();
-        if (data) {
-            if (data.discount_type === 'fixed') {
-                setDiscount(Number(data.discount_value));
-            } else {
-                setDiscount((getSubtotal() * Number(data.discount_value)) / 100);
+        try {
+            console.log("Checking coupon:", couponCode);
+            const { data, error } = await supabase.from('coupons').select('*').eq('code', couponCode).eq('is_active', true).single();
+            if (error) {
+                console.error("Supabase error fetching coupon:", error);
+                throw error;
             }
-            alert("Cupom aplicado com sucesso!");
-        } else {
-            alert("Cupom inválido ou expirado.");
+            if (data) {
+                if (data.discount_type === 'fixed') {
+                    setDiscount(Number(data.discount_value));
+                } else {
+                    setDiscount((getSubtotal() * Number(data.discount_value)) / 100);
+                }
+                alert("Cupom aplicado com sucesso!");
+            } else {
+                alert("Cupom inválido ou expirado.");
+            }
+        } catch (err) {
+            console.error("Fetch failure in handleApplyCoupon:", err);
+            alert("Erro ao aplicar cupom. Verifique o console.");
         }
     };
 

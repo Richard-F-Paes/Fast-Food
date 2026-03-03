@@ -57,11 +57,17 @@ export default function ProductDetailPage() {
         <div className="flex flex-col min-h-screen bg-white animate-in fade-in duration-700">
             {/* Product Image Area */}
             <div className="relative h-[450px] w-full bg-slate-100 rounded-b-[60px] overflow-hidden shadow-2xl">
-                <img
-                    src={product.image_url || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop"}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                />
+                {product.image_url || product.image ? (
+                    <img
+                        src={product.image_url || product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-300 uppercase font-black text-xs bg-slate-100">
+                        Sem Foto
+                    </div>
+                )}
 
                 {/* Navigation Overlays */}
                 <header className="absolute top-10 left-0 right-0 px-6 flex justify-between items-center z-20">
@@ -129,7 +135,7 @@ export default function ProductDetailPage() {
                                 id: product.id,
                                 name: product.name,
                                 price: product.price,
-                                image: product.image_url,
+                                image: product.image_url || product.image,
                                 quantity: quantity
                             });
                             router.push('/learning/food-app/cart');

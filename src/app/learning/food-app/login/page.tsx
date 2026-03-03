@@ -39,6 +39,7 @@ function LoginContent() {
 
             // Check if input is a username (doesn't contain @)
             if (!isSignUp && !email.includes("@")) {
+                console.log("Checking username mapping for:", email);
                 // Find profile by username and get their email
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
@@ -47,6 +48,7 @@ function LoginContent() {
                     .single();
 
                 if (profileError || !profile || !profile.email) {
+                    console.error("Profile check failed:", profileError);
                     throw new Error("Usuário não encontrado ou e-mail não vinculado. Tente usar seu e-mail.");
                 }
 
@@ -54,6 +56,7 @@ function LoginContent() {
             }
 
             if (isSignUp) {
+                console.log("Attempting sign up...");
                 const { error } = await supabase.auth.signUp({
                     email: loginEmail,
                     password,
@@ -61,11 +64,18 @@ function LoginContent() {
                         emailRedirectTo: window.location.origin + '/learning/food-app'
                     }
                 });
-                if (error) throw error;
+                if (error) {
+                    console.error("Sign up error:", error);
+                    throw error;
+                }
                 alert("Verifique seu e-mail para confirmar o cadastro!");
             } else {
+                console.log("Attempting sign in with password...");
                 const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
-                if (error) throw error;
+                if (error) {
+                    console.error("Login error:", error);
+                    throw error;
+                }
                 router.push(redirectTo);
             }
         } catch (err: unknown) {
