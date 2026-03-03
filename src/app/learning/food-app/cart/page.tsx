@@ -411,16 +411,16 @@ export default function CartPage() {
                 {/* STEP 2: Delivery Data */}
                 {step === 2 && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                        <h3 className="text-sm font-[1000] text-slate-400 uppercase tracking-widest px-1 italic text-center">Dados de Entrega</h3>
+                        <h3 className="text-sm font-[1000] text-slate-600 uppercase tracking-widest px-1 italic text-center">Dados de Entrega</h3>
 
                         <div className="bg-white rounded-[32px] p-6 border border-slate-100 shadow-sm space-y-5">
                             {/* Customer Name */}
                             <div className="space-y-2">
-                                <label className="text-[10px] font-[1000] text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+                                <label className="text-[10px] font-[1000] text-slate-600 uppercase tracking-widest flex items-center gap-2 px-1">
                                     <User className="w-3.5 h-3.5" /> Nome Completo
                                 </label>
                                 <input
-                                    className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-300 transition-all"
+                                    className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400 transition-all"
                                     placeholder="Seu nome completo"
                                     value={customerName}
                                     onChange={e => setCustomerName(e.target.value)}
@@ -429,11 +429,11 @@ export default function CartPage() {
 
                             {/* Phone */}
                             <div className="space-y-2">
-                                <label className="text-[10px] font-[1000] text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+                                <label className="text-[10px] font-[1000] text-slate-600 uppercase tracking-widest flex items-center gap-2 px-1">
                                     <Phone className="w-3.5 h-3.5" /> Telefone / WhatsApp
                                 </label>
                                 <input
-                                    className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-300 transition-all"
+                                    className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400 transition-all"
                                     placeholder="(00) 00000-0000"
                                     value={phone}
                                     onChange={e => setPhone(formatPhone(e.target.value))}
@@ -444,11 +444,11 @@ export default function CartPage() {
 
                             {/* CEP */}
                             <div className="space-y-2">
-                                <label className="text-[10px] font-[1000] text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+                                <label className="text-[10px] font-[1000] text-slate-600 uppercase tracking-widest flex items-center gap-2 px-1">
                                     <MapPin className="w-3.5 h-3.5" /> CEP
                                 </label>
                                 <input
-                                    className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-300 transition-all"
+                                    className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400 transition-all"
                                     placeholder="00000-000"
                                     value={address.cep}
                                     onChange={e => setAddress({ ...address, cep: formatCep(e.target.value) })}
@@ -457,9 +457,9 @@ export default function CartPage() {
 
                             {/* Street */}
                             <div className="space-y-2">
-                                <label className="text-[10px] font-[1000] text-slate-400 uppercase tracking-widest px-1">Rua / Logradouro</label>
+                                <label className="text-[10px] font-[1000] text-slate-600 uppercase tracking-widest px-1">Rua / Logradouro</label>
                                 <input
-                                    className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-300 transition-all"
+                                    className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400 transition-all"
                                     placeholder="Nome da sua rua"
                                     value={address.street}
                                     onChange={e => setAddress({ ...address, street: e.target.value })}
@@ -469,18 +469,18 @@ export default function CartPage() {
                             {/* Number & Complement */}
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-[1000] text-slate-400 uppercase tracking-widest px-1">Número</label>
+                                    <label className="text-[10px] font-[1000] text-slate-600 uppercase tracking-widest px-1">Número</label>
                                     <input
-                                        className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-300 text-center transition-all"
+                                        className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400 text-center transition-all"
                                         placeholder="Nº"
                                         value={address.number}
                                         onChange={e => setAddress({ ...address, number: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-[1000] text-slate-400 uppercase tracking-widest px-1">Complemento</label>
+                                    <label className="text-[10px] font-[1000] text-slate-600 uppercase tracking-widest px-1">Complemento</label>
                                     <input
-                                        className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-300 text-center transition-all"
+                                        className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400 text-center transition-all"
                                         placeholder="Apto, Bloco..."
                                         value={address.complement}
                                         onChange={e => setAddress({ ...address, complement: e.target.value })}
@@ -490,9 +490,9 @@ export default function CartPage() {
 
                             {/* Neighborhood */}
                             <div className="space-y-2">
-                                <label className="text-[10px] font-[1000] text-slate-400 uppercase tracking-widest px-1">Bairro</label>
+                                <label className="text-[10px] font-[1000] text-slate-600 uppercase tracking-widest px-1">Bairro</label>
                                 <input
-                                    className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-300 transition-all"
+                                    className="w-full h-14 bg-slate-50 rounded-2xl px-5 font-bold text-slate-900 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400 transition-all"
                                     placeholder="Seu bairro"
                                     value={address.neighborhood}
                                     onChange={e => setAddress({ ...address, neighborhood: e.target.value })}
@@ -526,7 +526,7 @@ export default function CartPage() {
                 {/* STEP 3: Payment */}
                 {step === 3 && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                        <h3 className="text-sm font-[1000] text-slate-400 uppercase tracking-widest px-1 italic text-center">Forma de Pagamento</h3>
+                        <h3 className="text-sm font-[1000] text-slate-600 uppercase tracking-widest px-1 italic text-center">Forma de Pagamento</h3>
 
                         <div className="grid grid-cols-3 gap-4">
                             {[
@@ -542,7 +542,7 @@ export default function CartPage() {
                                         payment === method.id ? "border-yellow-400 ring-2 ring-yellow-400/20 shadow-lg" : "border-slate-100"
                                     )}
                                 >
-                                    <method.icon className={cn("w-7 h-7 transition-colors", payment === method.id ? "text-yellow-500" : "text-slate-300")} />
+                                    <method.icon className={cn("w-7 h-7 transition-colors", payment === method.id ? "text-yellow-500" : "text-slate-500")} />
                                     <span className="text-[10px] font-[1000] text-slate-900 uppercase tracking-widest">{method.label}</span>
                                 </button>
                             ))}
@@ -557,12 +557,12 @@ export default function CartPage() {
                                     </div>
                                     <div>
                                         <h4 className="font-[1000] text-slate-900 text-sm uppercase tracking-tight">Chave PIX</h4>
-                                        <p className="text-[10px] font-bold text-slate-400">Copie e pague via seu banco</p>
+                                        <p className="text-[10px] font-bold text-slate-600">Copie e pague via seu banco</p>
                                     </div>
                                 </div>
                                 <div className="bg-white rounded-2xl p-4 flex items-center gap-3 border border-green-100">
                                     <div className="flex-1">
-                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Telefone</p>
+                                        <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1">Telefone</p>
                                         <p className="font-[1000] text-lg text-slate-900 tracking-tight">{PIX_KEY}</p>
                                     </div>
                                     <button
@@ -583,7 +583,7 @@ export default function CartPage() {
 
                         {/* Order Summary */}
                         <div className="bg-white rounded-[28px] p-5 border border-slate-100 shadow-sm space-y-3">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Resumo do Pedido</p>
+                            <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Resumo do Pedido</p>
                             {items.map(item => (
                                 <div key={item.id} className="flex justify-between items-center">
                                     <span className="text-xs font-bold text-slate-500 truncate max-w-[60%]">{item.quantity}x {item.name}</span>
@@ -591,7 +591,7 @@ export default function CartPage() {
                                 </div>
                             ))}
                             {deliveryFee > 0 && (
-                                <div className="flex justify-between items-center pt-1 text-slate-400">
+                                <div className="flex justify-between items-center pt-1 text-slate-600">
                                     <span className="text-xs font-bold">Entrega</span>
                                     <span className="font-bold text-xs">{`R$ ${deliveryFee.toFixed(2)}`}</span>
                                 </div>
